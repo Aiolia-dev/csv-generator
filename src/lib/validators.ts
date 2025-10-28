@@ -1,3 +1,5 @@
+import { estimateFileSize } from '@/lib/fileSizeCalculator';
+
 import { VALIDATION_MESSAGES } from '@/constants/messages';
 
 import {
@@ -316,6 +318,39 @@ export function validateCSVConfig(config: CSVConfig): ValidationResult {
 
   // Validate columns
   errors.push(...validateColumns(config.columns));
+
+  // Validate estimated file size doesn't exceed maximum
+  if (config.columns.length > 0) {
+    const rowsToGenerate =
+      config.file.useFileSize && config.file.targetFileSize > 0
+        ? config.file.totalRows // Will be calculated later, but validate target size
+        : config.file.totalRows;
+
+    const estimatedSize = estimateFileSize(
+      config.columns,
+      rowsToGenerate,
+      config.file.headerLines,
+      config.file.footerLines,
+      config.format
+    );
+
+    if (
+      estimatedSize &&
+      estimatedSize.megabytes > VALIDATION_LIMITS.MAX_FILE_SIZE
+    ) {
+      errors.push({
+        field: config.file.useFileSize ? 'targetFileSize' : 'totalRows',
+        message: `Estimated file size (${
+          estimatedSize.formatted
+        }) exceeds maximum allowed (${
+          VALIDATION_LIMITS.MAX_FILE_SIZE
+        } MB). Please reduce the ${
+          config.file.useFileSize ? 'target file size' : 'number of rows'
+        }.`,
+        severity: 'error',
+      });
+    }
+  }
 
   // Performance warnings
   if (config.file.totalRows > PERFORMANCE_THRESHOLDS.WARNING_ROWS) {

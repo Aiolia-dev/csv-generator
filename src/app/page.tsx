@@ -319,6 +319,9 @@ export default function HomePage() {
                   <div>
                     <label className='block text-sm font-medium text-gray-700 mb-2'>
                       Target File Size (MB)
+                      <span className='ml-2 text-xs text-gray-500'>
+                        Max: 8 MB
+                      </span>
                     </label>
                     <input
                       type='number'
@@ -332,6 +335,7 @@ export default function HomePage() {
                       placeholder='Enter size in MB'
                       className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                       min='0.1'
+                      max='8'
                       step='0.1'
                     />
                   </div>
