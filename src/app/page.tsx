@@ -298,7 +298,7 @@ export default function HomePage() {
               <h2 className='text-xl font-bold text-gray-800 mb-4'>
                 CSV Format
               </h2>
-              <div className='grid grid-cols-2 gap-4'>
+              <div className='grid grid-cols-3 gap-4'>
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-2'>
                     Delimiter
@@ -341,6 +341,35 @@ export default function HomePage() {
                     ))}
                   </select>
                 </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <span className='flex items-center gap-2'>
+                      Escape Character
+                      <div className='group relative'>
+                        <Info className='w-4 h-4 text-gray-400 cursor-help' />
+                        <div className='invisible group-hover:visible absolute left-0 top-6 z-10 w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg'>
+                          Character used to escape quotes within quoted fields
+                          (e.g., backslash \)
+                        </div>
+                      </div>
+                    </span>
+                  </label>
+                  <input
+                    type='text'
+                    value={formatConfig.escapeChar}
+                    onChange={(e) =>
+                      setFormatConfig({
+                        ...formatConfig,
+                        escapeChar: e.target.value,
+                      })
+                    }
+                    maxLength={1}
+                    placeholder='\'
+                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                  />
+                </div>
+              </div>
+              <div className='grid grid-cols-2 gap-4 mt-4'>
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-2'>
                     <span className='flex items-center gap-2'>
