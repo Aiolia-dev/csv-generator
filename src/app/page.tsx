@@ -64,9 +64,9 @@ export default function HomePage() {
   const estimatedSize = React.useMemo(() => {
     if (columns.length === 0) return null;
 
-    // If target file size is set, calculate based on that
+    // If using file size mode, calculate based on target file size
     const rowsToUse =
-      fileConfig.targetFileSize && fileConfig.targetFileSize > 0
+      fileConfig.useFileSize && fileConfig.targetFileSize > 0
         ? calculateRowsForFileSize(
             fileConfig.targetFileSize,
             columns,
@@ -88,7 +88,7 @@ export default function HomePage() {
   // Calculate rows that will be generated
   const actualRowsToGenerate = React.useMemo(() => {
     if (
-      fileConfig.targetFileSize &&
+      fileConfig.useFileSize &&
       fileConfig.targetFileSize > 0 &&
       columns.length > 0
     ) {
@@ -252,44 +252,90 @@ export default function HomePage() {
               <h2 className='text-xl font-bold text-gray-800 mb-4'>
                 File Structure
               </h2>
+
+              {/* Generation Mode Toggle */}
+              <div className='mb-4 p-4 bg-gray-50 rounded-lg'>
+                <label className='block text-sm font-medium text-gray-700 mb-3'>
+                  Generation Mode
+                </label>
+                <div className='flex gap-4'>
+                  <label className='flex items-center gap-2 cursor-pointer'>
+                    <input
+                      type='radio'
+                      name='generationMode'
+                      checked={!fileConfig.useFileSize}
+                      onChange={() =>
+                        setFileConfig({
+                          ...fileConfig,
+                          useFileSize: false,
+                        })
+                      }
+                      className='w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500'
+                    />
+                    <span className='text-sm text-gray-700'>
+                      By Number of Rows
+                    </span>
+                  </label>
+                  <label className='flex items-center gap-2 cursor-pointer'>
+                    <input
+                      type='radio'
+                      name='generationMode'
+                      checked={fileConfig.useFileSize}
+                      onChange={() =>
+                        setFileConfig({
+                          ...fileConfig,
+                          useFileSize: true,
+                        })
+                      }
+                      className='w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500'
+                    />
+                    <span className='text-sm text-gray-700'>
+                      By Target File Size
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               <div className='grid grid-cols-2 gap-4'>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Total Data Rows
-                  </label>
-                  <input
-                    type='number'
-                    value={fileConfig.totalRows}
-                    onChange={(e) =>
-                      setFileConfig({
-                        ...fileConfig,
-                        totalRows: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-                    min='1'
-                  />
-                </div>
-                <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Target File Size (MB)
-                    <span className='ml-2 text-xs text-gray-500'>Optional</span>
-                  </label>
-                  <input
-                    type='number'
-                    value={fileConfig.targetFileSize || ''}
-                    onChange={(e) =>
-                      setFileConfig({
-                        ...fileConfig,
-                        targetFileSize: parseFloat(e.target.value) || 0,
-                      })
-                    }
-                    placeholder='Optional'
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-                    min='0'
-                    step='0.1'
-                  />
-                </div>
+                {!fileConfig.useFileSize ? (
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Total Data Rows
+                    </label>
+                    <input
+                      type='number'
+                      value={fileConfig.totalRows}
+                      onChange={(e) =>
+                        setFileConfig({
+                          ...fileConfig,
+                          totalRows: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                      min='1'
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Target File Size (MB)
+                    </label>
+                    <input
+                      type='number'
+                      value={fileConfig.targetFileSize || ''}
+                      onChange={(e) =>
+                        setFileConfig({
+                          ...fileConfig,
+                          targetFileSize: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      placeholder='Enter size in MB'
+                      className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                      min='0.1'
+                      step='0.1'
+                    />
+                  </div>
+                )}
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-2'>
                     Header Lines
@@ -571,9 +617,10 @@ export default function HomePage() {
                     {actualRowsToGenerate.toLocaleString()}
                   </span>
                 </div>
-                {fileConfig.targetFileSize && fileConfig.targetFileSize > 0 && (
+                {fileConfig.useFileSize && (
                   <div className='text-xs text-blue-600 -mt-2'>
-                    Calculated from target file size
+                    Calculated from target file size (
+                    {fileConfig.targetFileSize} MB)
                   </div>
                 )}
                 <div className='flex justify-between'>

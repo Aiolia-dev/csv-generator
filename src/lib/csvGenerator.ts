@@ -31,8 +31,8 @@ export async function generateCSV(
     // Determine number of rows to generate
     let rowsToGenerate = config.file.totalRows;
 
-    // If target file size is specified and greater than 0, calculate rows needed
-    if (config.file.targetFileSize && config.file.targetFileSize > 0) {
+    // If using file size mode, calculate rows needed
+    if (config.file.useFileSize && config.file.targetFileSize > 0) {
       rowsToGenerate = calculateRowsForFileSize(
         config.file.targetFileSize,
         config.columns,
