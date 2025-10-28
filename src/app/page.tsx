@@ -13,7 +13,10 @@ import * as React from 'react';
 
 import { generateCSV, generatePreview } from '@/lib/csvGenerator';
 import { downloadCSV, generateFilename } from '@/lib/downloadHelper';
-import { estimateFileSize } from '@/lib/fileSizeCalculator';
+import {
+  calculateRowsForFileSize,
+  estimateFileSize,
+} from '@/lib/fileSizeCalculator';
 import { validateCSVConfig } from '@/lib/validators';
 
 import {
@@ -57,17 +60,48 @@ export default function HomePage() {
     null
   );
 
-  // Calculate estimated file size
+  // Calculate estimated file size or rows needed
   const estimatedSize = React.useMemo(() => {
     if (columns.length === 0) return null;
+
+    // If target file size is set, calculate based on that
+    const rowsToUse =
+      fileConfig.targetFileSize && fileConfig.targetFileSize > 0
+        ? calculateRowsForFileSize(
+            fileConfig.targetFileSize,
+            columns,
+            fileConfig.headerLines,
+            fileConfig.footerLines,
+            formatConfig
+          )
+        : fileConfig.totalRows;
+
     return estimateFileSize(
       columns,
-      fileConfig.totalRows,
+      rowsToUse,
       fileConfig.headerLines,
       fileConfig.footerLines,
       formatConfig
     );
   }, [columns, fileConfig, formatConfig]);
+
+  // Calculate rows that will be generated
+  const actualRowsToGenerate = React.useMemo(() => {
+    if (
+      fileConfig.targetFileSize &&
+      fileConfig.targetFileSize > 0 &&
+      columns.length > 0
+    ) {
+      return calculateRowsForFileSize(
+        fileConfig.targetFileSize,
+        columns,
+        fileConfig.headerLines,
+        fileConfig.footerLines,
+        formatConfig
+      );
+    }
+    return fileConfig.totalRows;
+  }, [fileConfig, columns, formatConfig]);
 
   // Validate configuration
   const validation = React.useMemo(() => {
@@ -532,11 +566,16 @@ export default function HomePage() {
               <h2 className='text-xl font-bold text-gray-800 mb-4'>Summary</h2>
               <div className='space-y-3 text-sm'>
                 <div className='flex justify-between'>
-                  <span className='text-gray-600'>Rows:</span>
+                  <span className='text-gray-600'>Rows to Generate:</span>
                   <span className='font-semibold'>
-                    {fileConfig.totalRows.toLocaleString()}
+                    {actualRowsToGenerate.toLocaleString()}
                   </span>
                 </div>
+                {fileConfig.targetFileSize && fileConfig.targetFileSize > 0 && (
+                  <div className='text-xs text-blue-600 -mt-2'>
+                    Calculated from target file size
+                  </div>
+                )}
                 <div className='flex justify-between'>
                   <span className='text-gray-600'>Columns:</span>
                   <span className='font-semibold'>{columns.length}</span>

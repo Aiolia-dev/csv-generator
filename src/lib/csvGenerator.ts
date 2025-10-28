@@ -5,6 +5,7 @@ import {
   generateHeaders,
 } from './csvFormatter';
 import { generateDataForType } from './dataGenerators';
+import { calculateRowsForFileSize } from './fileSizeCalculator';
 
 import {
   Column,
@@ -27,6 +28,20 @@ export async function generateCSV(
   try {
     let csvContent = '';
 
+    // Determine number of rows to generate
+    let rowsToGenerate = config.file.totalRows;
+
+    // If target file size is specified and greater than 0, calculate rows needed
+    if (config.file.targetFileSize && config.file.targetFileSize > 0) {
+      rowsToGenerate = calculateRowsForFileSize(
+        config.file.targetFileSize,
+        config.columns,
+        config.file.headerLines,
+        config.file.footerLines,
+        config.format
+      );
+    }
+
     // 1. Generate headers
     if (config.file.headerLines > 0) {
       csvContent += generateHeaders(
@@ -39,7 +54,7 @@ export async function generateCSV(
     // 2. Generate data rows
     const dataRows = generateDataRows(
       config.columns,
-      config.file.totalRows,
+      rowsToGenerate,
       config.format
     );
     csvContent += dataRows;
@@ -49,7 +64,7 @@ export async function generateCSV(
       csvContent += generateFooters(
         config.file.footerLines,
         config.columns.length,
-        config.file.totalRows,
+        rowsToGenerate,
         config.format
       );
     }
