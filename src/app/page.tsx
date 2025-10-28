@@ -5,6 +5,7 @@ import {
   Eye,
   FileText,
   GripVertical,
+  Info,
   Plus,
   Trash2,
 } from 'lucide-react';
@@ -342,7 +343,16 @@ export default function HomePage() {
                 </div>
                 <div>
                   <label className='block text-sm font-medium text-gray-700 mb-2'>
-                    Line Ending
+                    <span className='flex items-center gap-2'>
+                      Line Ending
+                      <div className='group relative'>
+                        <Info className='w-4 h-4 text-gray-400 cursor-help' />
+                        <div className='invisible group-hover:visible absolute left-0 top-6 z-10 w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg'>
+                          Choose the line ending format: LF (Unix/Mac), CRLF
+                          (Windows), or CR (old Mac)
+                        </div>
+                      </div>
+                    </span>
                   </label>
                   <select
                     value={formatConfig.lineEnding}
@@ -401,6 +411,14 @@ export default function HomePage() {
                   <span className='text-sm text-gray-700'>
                     Quote all fields
                   </span>
+                  <div className='group relative'>
+                    <Info className='w-4 h-4 text-gray-400 cursor-help' />
+                    <div className='invisible group-hover:visible absolute left-0 top-6 z-10 w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg'>
+                      When enabled, all fields will be wrapped in quotes.
+                      Otherwise, only fields containing special characters
+                      (delimiters, quotes, newlines) will be quoted.
+                    </div>
+                  </div>
                 </label>
               </div>
             </div>
