@@ -607,6 +607,14 @@ export default function HomePage() {
             </div>
           </div>
         )}
+
+        {/* Footer */}
+        <div className='mt-8 text-center'>
+          <p className='text-sm text-gray-600'>
+            Developed by <span className='font-semibold'>Cédric K.</span>{' '}
+            Outscale
+          </p>
+        </div>
       </div>
     </main>
   );
