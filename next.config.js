@@ -6,17 +6,24 @@ const nextConfig = {
 
   reactStrictMode: true,
 
-  // Uncoment to add domain whitelist
-  // images: {
-  //   remotePatterns: [
-  //     {
-  //       protocol: 'https',
-  //       hostname: 'res.cloudinary.com',
-  //     },
-  //   ]
-  // },
+  // Optimize for static export (client-side only app)
+  output: 'export',
 
-  webpack(config) {
+  // Disable image optimization for static export
+  images: {
+    unoptimized: true,
+  },
+
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
     // Grab the existing rule that handles SVG imports
     const fileLoaderRule = config.module.rules.find((rule) =>
       rule.test?.test?.('.svg')
