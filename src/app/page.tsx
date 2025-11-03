@@ -468,22 +468,45 @@ export default function HomePage() {
                     </span>
                   </label>
                   <select
-                    value={formatConfig.lineEnding}
-                    onChange={(e) =>
+                    value={
+                      formatConfig.lineEnding === LineEnding.LF
+                        ? 'LF'
+                        : formatConfig.lineEnding === LineEnding.CRLF
+                        ? 'CRLF'
+                        : 'CR'
+                    }
+                    onChange={(e) => {
+                      let newLineEnding: LineEnding;
+                      switch (e.target.value) {
+                        case 'LF':
+                          newLineEnding = LineEnding.LF;
+                          break;
+                        case 'CRLF':
+                          newLineEnding = LineEnding.CRLF;
+                          break;
+                        case 'CR':
+                          newLineEnding = LineEnding.CR;
+                          break;
+                        default:
+                          newLineEnding = LineEnding.LF;
+                      }
+
                       setFormatConfig({
                         ...formatConfig,
-                        lineEnding: e.target.value as LineEnding,
-                      })
-                    }
+                        lineEnding: newLineEnding,
+                      });
+                    }}
                     className='w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                   >
-                    {Object.entries(LINE_ENDING_LABELS).map(
-                      ([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      )
-                    )}
+                    <option value='LF'>
+                      {LINE_ENDING_LABELS[LineEnding.LF]}
+                    </option>
+                    <option value='CRLF'>
+                      {LINE_ENDING_LABELS[LineEnding.CRLF]}
+                    </option>
+                    <option value='CR'>
+                      {LINE_ENDING_LABELS[LineEnding.CR]}
+                    </option>
                   </select>
                 </div>
                 <div>
